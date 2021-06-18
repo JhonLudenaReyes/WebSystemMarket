@@ -17,6 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.webservices.market.domain.Product;
 import com.webservices.market.domain.service.ProductService;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
 @RequestMapping("/products")
 public class ProductController {
@@ -25,12 +30,20 @@ public class ProductController {
 	private ProductService productService;
 	
 	@GetMapping("/all")
+	@ApiOperation("Get all supermarket products")
+	@ApiResponse(code = 200, message = "OK")
 	public ResponseEntity<List<Product>> getAll(){
 		return new ResponseEntity<>(productService.getAll(), HttpStatus.OK);
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Product> getProduct(@PathVariable("id") int productId){
+	@ApiOperation("Search a product with an ID")
+	@ApiResponses({
+		@ApiResponse(code = 200, message = "Ok"),
+		@ApiResponse(code = 404, message = "Product no"),
+	})
+	public ResponseEntity<Product> getProduct(@ApiParam(value = "The id of the product", required = true, example = "7") 
+												@PathVariable("id") int productId){
 		return productService.getProduct(productId)
 				.map(product -> new ResponseEntity<>(product, HttpStatus.OK))
 				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
